@@ -5,4 +5,5 @@ export enum Categoria {
     Limpeza = "Limpeza",
     Bebida = "Bebida",
     Tecnologia = "Tecnologia",
+    Eletrodomestico = "Eletrodoméstico",
 };

@@ -1,11 +1,17 @@
 import { Input } from "@/components/Input";
+import Select from "@/components/Select";
+import { RootStackParamList } from "@/routes/navigationTypes";
 import { productsStorage } from "@/storage/productsStorage";
 import { Categoria } from "@/types/Categoria/categoriaTypes";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useState } from "react";
-import { Button, Text, TextInput, View } from "react-native";
+import { Alert, Button, Text, TextInput, View } from "react-native";
 
 
 export default function Register() {
+
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
@@ -13,29 +19,35 @@ export default function Register() {
     const [quantity, setQuantity] = useState(0);
     const [category, setCategory] = useState<Categoria>(Categoria.Nenhuma);
 
-
-    function handleChangeName(event: React.ChangeEvent<HTMLInputElement>) {
-        setName(event.target.value);
+    function handleChangePrice(value: string) {
+        setPrice(Number(value));
     }
 
-    function handleChangeDescription(event: React.ChangeEvent<HTMLInputElement>) {
-        setDescription(event.target.value);
-    }
-
-    function handleChangePrice(event: React.ChangeEvent<HTMLInputElement>) {
-        setPrice(Number(event.target.value));
-    }
-
-    function handleChangeQuantity(event: React.ChangeEvent<HTMLInputElement>) {
-        setQuantity(Number(event.target.value));
-    }
-
-    function handleChangeCategory(event: React.ChangeEvent<HTMLSelectElement>) {
-        const category = event.target.value as Categoria;
-        setCategory(category);
+    function handleChangeQuantity(value: string) {
+        setQuantity(Number(value));
     }
 
     async function handleAdd() {
+
+        if (name.trim() === "") {
+            Alert.alert("Nome Inválido", "O campo nome não pode estar vazio!");
+            return;
+        }
+
+        if (description.trim() === "") {
+            Alert.alert("Descrição Inválida", "O campo descrição não pode estar vazio!");
+            return;
+        }
+
+        if (price <= 0) {
+            Alert.alert("Preço Inválido", "O campo preço não pode ser nulo ou negativo!");
+            return;
+        }
+
+        if (quantity <= 0) {
+            Alert.alert("Quantidade Inválida", "O campo quantidade não pode ser nulo ou negativo!");
+            return;
+        }
 
         const newProduct = {
             id: Math.random().toString(36).substring(2),
@@ -48,7 +60,11 @@ export default function Register() {
 
         console.log(newProduct);
 
-        // await productsStorage.add(newProduct);
+        await productsStorage.add(newProduct);
+
+        Alert.alert("Concluído", "Novo produto cadastrado com sucesso!");
+
+        navigation.goBack();
 
     }
     
@@ -59,33 +75,32 @@ export default function Register() {
             <Text>Nome:</Text>
             <Input
                 value={name}
-                onChange={handleChangeName}
+                onChangeText={setName}
             />
 
             <Text>Descrição:</Text>
             <Input
                 value={description}
-                onChange={handleChangeDescription}
+                onChangeText={setDescription}
             />
 
             <Text>Preço:</Text>
             <Input
                 value={price.toString()}
-                onChange={handleChangePrice}
+                onChangeText={handleChangePrice}
             />
 
             <Text>Quantidade:</Text>
             <Input
                 value={quantity.toString()}
-                onChange={handleChangeQuantity}
+                onChangeText={handleChangeQuantity}
             />
 
             <Text>Categoria:</Text>
-            <select>
-                <option>{Categoria.Bebida}</option>
-                <option>{Categoria.Comida}</option>
-                <option>{Categoria.Limpeza}</option>
-            </select>
+            <Select
+                categories={Object.values(Categoria)}
+                onChangeSelect={setCategory}
+            />
 
             <Button
                 title="Cadastrar"

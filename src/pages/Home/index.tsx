@@ -28,6 +28,10 @@ export default function Home( { navigation }: Props ) {
 
     }
 
+    useEffect(() => {
+        getProducts();
+    }, []);
+
     function handleOpenRegister() {
         navigation.navigate("Register");
     }
@@ -41,7 +45,21 @@ export default function Home( { navigation }: Props ) {
                 onPress={handleOpenRegister}
             />
 
-            <ProdutoCard
+            {
+
+                (products.length == 0)
+                ? <Text>Não há produtos cadastrados.</Text>
+                : products.map((product) => (
+
+                    <ProdutoCard
+                        key={product.id}
+                        product={product}
+                    />
+
+                ))
+            }
+
+            {/* <ProdutoCard
                 product={{
                     id: "123",
                     name: "Notebook",
@@ -50,7 +68,7 @@ export default function Home( { navigation }: Props ) {
                     quantity: 1,
                     category: Categoria.Tecnologia
                 }}
-            />
+            /> */}
 
         </View>
 
