@@ -1,7 +1,12 @@
 import { RootStackParamList } from "@/routes/navigationTypes";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Button, Text, View } from "react-native";
+import { Alert, Button, Text, View } from "react-native";
+import { useState, useEffect } from "react";
 import { styles } from "./styles";
+import ProdutoCard from "@/components/ProdutoCard";
+import { Categoria } from "@/types/Categoria/categoriaTypes";
+import { Produto } from "@/types/Produto/produtoTypes";
+import { productsStorage } from "@/storage/productsStorage";
 
 type Props = NativeStackScreenProps<
     RootStackParamList, 
@@ -9,6 +14,19 @@ type Props = NativeStackScreenProps<
 >;
 
 export default function Home( { navigation }: Props ) {
+
+    const [products, setProducts] = useState<Produto[]>([]);
+
+    async function getProducts() {
+
+        try {
+            const response = await productsStorage.get();
+            setProducts(response);
+        } catch (error) {
+            Alert.alert("Erro", "Não foi possível filtrar os itens.");
+        }
+
+    }
 
     function handleOpenRegister() {
         navigation.navigate("Register");
@@ -18,26 +36,21 @@ export default function Home( { navigation }: Props ) {
 
         <View style={styles.container}>
 
-            <View style={styles.card}>
+            <Button
+                title="Novo Produto"
+                onPress={handleOpenRegister}
+            />
 
-                <Text style={styles.title}>
-                    Notebook
-                </Text>
-
-                <Text style={styles.description}>
-                    Notebook com 16 GB de memória RAM e armazenamento SSD.
-                </Text>
-
-                <Text style={styles.price}>
-                    R$ 3.500,00
-                </Text>
-
-                <Button
-                    title="Ver detalhes"
-                    onPress={handleOpenRegister}
-                />
-
-            </View>
+            <ProdutoCard
+                product={{
+                    id: "123",
+                    name: "Notebook",
+                    description: "Notebook com 16 GB de memória RAM e armazenamento SSD.",
+                    price: 3000.0,
+                    quantity: 1,
+                    category: Categoria.Tecnologia
+                }}
+            />
 
         </View>
 
